@@ -21,16 +21,15 @@ def pregunta_01():
     214
 
     """
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
 
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    data = [row.split('\t') for row in data]
+    data = [int(row[1]) for row in data]
 
-    sum_column = 0
-    for row in data:
-        sum_column = sum_column + int(row[1])
+    result = sum(data)
 
-    return sum_column
+    return result
 
 
 def pregunta_02():
@@ -49,10 +48,11 @@ def pregunta_02():
 
     """
     from collections import Counter
+    from operator import itemgetter
 
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row[0] for row in data]
 
     count_letters = Counter()
 
@@ -60,7 +60,7 @@ def pregunta_02():
         count_letters[row[0]] += 1
 
     count_letters_tuples = list(count_letters.items())
-    count_letters_tuples = sorted(count_letters_tuples)
+    count_letters_tuples = sorted(count_letters_tuples, key=itemgetter(0), reverse=False)
 
     return count_letters_tuples
 
@@ -80,28 +80,25 @@ def pregunta_03():
     ]
 
     """
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    from operator import itemgetter
 
-    set_letters = []
-    for row in data:
-        letter = row[0]
-        if letter not in set_letters:
-            set_letters.append(letter)
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.split('\t') for row in data]
+    data = [row[:2] for row in data]
 
-    sum_letters = []
-    for letter in set_letters:
-        sum_letter = 0
-        for row in data:
-            if row[0] == letter:
-                sum_letter = sum_letter + int(row[1])
-        sum_letters.append(sum_letter)
+    result = {}
+    for letter, value_letter in data:
+        value_letter = int(value_letter)
+        if letter in result.keys():
+            result[letter] = result[letter] + value_letter
+        else:
+            result[letter] = value_letter
 
-    sum_letter_tuple = list(zip(set_letters, sum_letters))
-    sum_letter_tuple = sorted(sum_letter_tuple)
+    result = [(key, value_letter) for key, value_letter in result.items()]
+    result = sorted(result, key=itemgetter(0), reverse=False)
 
-    return sum_letter_tuple
+    return result
 
 
 def pregunta_04():
@@ -127,23 +124,20 @@ def pregunta_04():
 
     """
     from collections import Counter
+    from operator import itemgetter
 
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
-
-    registers_date = []
-    for row in data:
-        date = row[2].split('-')
-        registers_date.append(date)
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.split('\t') for row in data]
+    data = [row[2].split('-') for row in data]
 
     registers_by_month = Counter()
 
-    for row in registers_date:
+    for row in data:
         registers_by_month[row[1]] += 1
 
     registers_by_month_tuples = list(registers_by_month.items())
-    registers_by_month_tuples = sorted(registers_by_month_tuples)
+    registers_by_month_tuples = sorted(registers_by_month_tuples, key=itemgetter(0), reverse=False)
 
     return registers_by_month_tuples
 
@@ -163,37 +157,26 @@ def pregunta_05():
     ]
 
     """
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    from operator import itemgetter
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.split('\t') for row in data]
+    data = [row[:2] for row in data]
 
-    set_letters = []
-    for row in data:
-        letter = row[0]
-        if letter not in set_letters:
-            set_letters.append(letter)
+    result = {}
 
-    min_value_letter = []
-    max_value_letter = []
-    for letter in set_letters:
-        values_letter = []
-        for row in data:
-            if row[0] == letter:
-                values_letter.append(int(row[1]))
-        max_value = None
-        min_value = None
-        for num in values_letter:
-            if max_value is None or num > max_value:
-                max_value = num
-            if min_value is None or num < min_value:
-                min_value = num
-        min_value_letter.append(min_value)
-        max_value_letter.append(max_value)
+    for letter, letter_value in data:
+        letter_value = int(letter_value)
+        if letter in result.keys():
+            result[letter].append(letter_value)
+        else:
+            result[letter] = [letter_value]
 
-    tuple_min_max = list(zip(set_letters, max_value_letter, min_value_letter))
-    tuple_min_max = sorted(tuple_min_max)
+    result = [(key, max(letter_value), min(letter_value)) for key, letter_value in result.items()]
 
-    return tuple_min_max
+    result = sorted(result, key=itemgetter(0), reverse=False)
+
+    return result
 
 
 def pregunta_06():
@@ -218,44 +201,29 @@ def pregunta_06():
     ]
 
     """
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    from operator import itemgetter
 
-    key_value_dict = []
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.replace("\n", "") for row in data]
+    data = [row.split('\t') for row in data]
+
+    result = {}
+
     for row in data:
-        key_dict = row[4].split(',')
-        for element in key_dict:
-            elements_dict = element.split(':')
-            key_value_dict.append([elements_dict[0], int(elements_dict[1])])
+        elementos_dict = row[4].split(',')
+        elementos_dict = [row.split(':') for row in elementos_dict]
+        for letras, valor in elementos_dict:
+            if letras in result.keys():
+                result[letras].append(int(valor))
+            else:
+                result[letras] = [int(valor)]
 
-    set_keys = []
-    for row in key_value_dict:
-        value_key = row[0]
-        if value_key not in set_keys:
-            set_keys.append(value_key)
+    result = [(letras,  min(valor), max(valor)) for letras, valor in result.items()]
 
-    min_value_key = []
-    max_value_key = []
-    for key in set_keys:
-        values_key = []
-        for row in key_value_dict:
-            if row[0] == key:
-                values_key.append(row[1])
-        max_value = None
-        min_value = None
-        for num in values_key:
-            if max_value is None or num > max_value:
-                max_value = num
-            if min_value is None or num < min_value:
-                min_value = num
-        min_value_key.append(min_value)
-        max_value_key.append(max_value)
+    result = sorted(result, key=itemgetter(0), reverse=False)
 
-    tuple_min_max = list(zip(set_keys, min_value_key, max_value_key))
-    tuple_min_max = sorted(tuple_min_max)
-
-    return tuple_min_max
+    return result
 
 
 def pregunta_07():
@@ -279,28 +247,26 @@ def pregunta_07():
     ]
 
     """
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    from operator import itemgetter
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.split('\t') for row in data]
+    data = [row[:2] for row in data]
 
-    set_numbers = []
-    for row in data:
-        number = int(row[1])
-        if number not in set_numbers:
-            set_numbers.append(number)
+    result = {}
 
-    numbers_letters = []
-    for number in set_numbers:
-        letters = []
-        for row in data:
-            if int(row[1]) == number:
-                letters.append(row[0])
-        numbers_letters.append(letters)
+    for letra, valor in data:
+        valor = int(valor)
+        if valor in result.keys():
+            result[valor].append(letra)
+        else:
+            result[valor] = [letra]
 
-    numbers_letters_tuple = list(zip(set_numbers, numbers_letters))
-    numbers_letters_tuple = sorted(numbers_letters_tuple)
+    result = [(valor, letra) for valor, letra in result.items()]
 
-    return numbers_letters_tuple
+    result = sorted(result, key=itemgetter(0), reverse=False)
+
+    return result
 
 
 def pregunta_08():
@@ -325,30 +291,28 @@ def pregunta_08():
     ]
 
     """
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    from operator import itemgetter
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.split('\t') for row in data]
+    data = [row[:2] for row in data]
 
-    set_numbers = []
-    for row in data:
-        number = int(row[1])
-        if number not in set_numbers:
-            set_numbers.append(number)
+    result = {}
 
-    numbers_letters = []
-    for number in set_numbers:
-        letters = []
-        for row in data:
-            if int(row[1]) == number:
-                if row[0] not in letters:
-                    letters.append(row[0])
-                    letters = sorted(letters)
-        numbers_letters.append(letters)
+    for letter, letter_value in data:
+        letter_value = int(letter_value)
+        if letter_value in result.keys():
+            result[letter_value].append(letter)
+        else:
+            result[letter_value] = [letter]
 
-    numbers_letters_tuple = list(zip(set_numbers, numbers_letters))
-    numbers_letters_tuple = sorted(numbers_letters_tuple)
+    result = {letter_value: list(set(letter)) for letter_value, letter in result.items()}
 
-    return numbers_letters_tuple
+    result = [(letter_value, sorted(letter)) for letter_value, letter in result.items()]
+
+    result = sorted(result, key=itemgetter(0), reverse=False)
+
+    return result
 
 
 def pregunta_09():
@@ -371,28 +335,28 @@ def pregunta_09():
     }
 
     """
-    from collections import Counter
+    from operator import itemgetter
 
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.replace("\n", "") for row in data]
+    data = [row.split('\t') for row in data]
+    data = [row[4] for row in data]
+    data = [row.split(',') for row in data]
+    data = [line.split(':')[0] for row in data for line in row]
 
-    key_value_dict = []
-    for row in data:
-        key_dict = row[4].split(',')
-        for element in key_dict:
-            elements_dict = element.split(':')
-            key_value_dict.append([elements_dict[0], int(elements_dict[1])])
+    result = {}
+    for letters in data:
+        if letters in result.keys():
+            result[letters] = result[letters] + 1
+        else:
+            result[letters] = 1
 
-    count_key = Counter()
-    for row in key_value_dict:
-        count_key[row[0]] += 1
+    result = [(letter, letter_value) for letter, letter_value in result.items()]
 
-    count_key = dict(count_key)
+    result = sorted(result, key=itemgetter(0), reverse=False)
 
-    count_key = {key: value for key, value in sorted(count_key.items(), key=lambda item: item[0])}
-
-    return count_key
+    return result
 
 
 def pregunta_10():
@@ -412,27 +376,19 @@ def pregunta_10():
     ]
 
     """
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.replace("\n", "") for row in data]
+    data = [row.split('\t') for row in data]
+    data = [[row[0]] + row[3:5] for row in data]
 
-    def total_elements(data_list):
-        count = 0
-        for element in data_list:
-            count += 1
-        return count
+    result = []
 
-    letters = []
-    count_col4 = []
-    count_col5 = []
     for row in data:
-        col4 = total_elements(row[3].split(','))
-        col5 = total_elements(row[4].split(','))
-        letters.append(row[0])
-        count_col4.append(col4)
-        count_col5.append(col5)
-
-    result = list(zip(letters, count_col4, count_col5))
+        col_four = len(row[1].split(','))
+        col_five = len(row[2].split(','))
+        tuple_elements = (row[0], col_four, col_five)
+        result.append(tuple_elements)
 
     return result
 
@@ -455,35 +411,26 @@ def pregunta_11():
 
     """
 
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.replace("\n", "") for row in data]
+    data = [row.split('\t') for row in data]
+    data = [[row[1]] + [row[3]] for row in data]
 
-    data_letters = []
+    result = {}
+
     for row in data:
-        letters = row[3].split(',')
-        for element in letters:
-            set_elements = [element, row[1]]
-            data_letters.append(set_elements)
+        letter_value = int(row[0])
+        letters = row[1].split(',')
+        for row_letter in letters:
+            if row_letter in result.keys():
+                result[row_letter].append(letter_value)
+            else:
+                result[row_letter] = [letter_value]
 
-    set_letters = []
-    for row in data_letters:
-        letter = row[0]
-        if letter not in set_letters:
-            set_letters.append(letter)
+    result = dict((key, sum(letter_value)) for key, letter_value in sorted(result.items(), key=lambda t: t[0]))
 
-    sum_letters = []
-    for letter in set_letters:
-        sum_letter = 0
-        for row in data_letters:
-            if row[0] == letter:
-                sum_letter = sum_letter + int(row[1])
-        sum_letters.append(sum_letter)
-
-    my_dict = dict(zip(set_letters, sum_letters))
-    my_dict = {key: value for key, value in sorted(my_dict.items(), key=lambda item: item[0])}
-
-    return my_dict
+    return result
 
 
 def pregunta_12():
@@ -501,33 +448,24 @@ def pregunta_12():
     }
 
     """
-    data = open("data.csv")
-    data = [line.replace("\n", "") for line in data]
-    data = [line.split('\t') for line in data]
+    with open('data.csv', 'r') as file:
+        data = file.readlines()
+    data = [row.replace("\n", "") for row in data]
+    data = [row.split('\t') for row in data]
+    data = [[row[0]] + [row[4]] for row in data]
 
-    data_letters = []
+    result = {}
+
     for row in data:
-        letters = row[4].split(',')
-        for element in letters:
-            split_element = int(element.split(':')[1])
-            set_elements = [row[0], split_element]
-            data_letters.append(set_elements)
-
-    set_letters = []
-    for row in data_letters:
         letter = row[0]
-        if letter not in set_letters:
-            set_letters.append(letter)
+        letter_value= row[1].split(',')
+        for row_value in letter_value:
+            element = int(row_value.split(':')[1])
+            if letter in result.keys():
+                result[letter].append(element)
+            else:
+                result[letter] = [element]
 
-    sum_letters = []
-    for letter in set_letters:
-        sum_letter = 0
-        for row in data_letters:
-            if row[0] == letter:
-                sum_letter = sum_letter + int(row[1])
-        sum_letters.append(sum_letter)
+    result = dict((key, sum(letter_value)) for key, letter_value in sorted(result.items(), key=lambda t: t[0]))
 
-    my_dict = dict(zip(set_letters, sum_letters))
-    my_dict = {key: value for key, value in sorted(my_dict.items(), key=lambda item: item[0])}
-
-    return my_dict
+    return result
