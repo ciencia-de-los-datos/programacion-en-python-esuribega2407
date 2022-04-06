@@ -335,7 +335,6 @@ def pregunta_09():
     }
 
     """
-    from operator import itemgetter
 
     with open('data.csv', 'r') as file:
         data = file.readlines()
@@ -352,9 +351,7 @@ def pregunta_09():
         else:
             result[letters] = 1
 
-    result = [(letter, letter_value) for letter, letter_value in result.items()]
-
-    result = sorted(result, key=itemgetter(0), reverse=False)
+    result = dict((key, letters) for key, letters in sorted(result.items(), key=lambda t: t[0]))
 
     return result
 
